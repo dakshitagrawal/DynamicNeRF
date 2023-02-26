@@ -1,8 +1,9 @@
 import os
 import time
-import torch
+
 import imageio
 import numpy as np
+import torch
 import torch.nn.functional as F
 
 from run_nerf_helpers import *
