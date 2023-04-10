@@ -79,12 +79,6 @@ def mask_loss(loss_dict, key, blending, dynamicness, alpha, mask):
         loss_dict[f"mask{key}_loss/{obj_idx:02d}"] = img2mae(obj_dynamicness, obj_mask)
 
         if obj_idx != 0:
-            # TODO
-            # Penalize blending of static if it is at same point as dynamic object point
-            # The above will fail when we move the dynamic object moves through time or
-            # the dynamic camera moves
-            # Sparsity loss with blending loss might help ensure this.
-
             # Make blending outside dynamic mask be zero
             loss_dict[f"mask{key}_loss/{obj_idx:02d}"] += L1(
                 obj_blending[(1 - obj_mask).type(torch.bool)]
@@ -118,16 +112,12 @@ def slow_scene_flow(ret, loss_dict):
 
 
 def order_loss(ret, loss_dict, mask):
-    # Ensure depth for background is same by dynamic nerf and static nerf
-    loss_dict["order_loss"] = img2mae(
-        ret["depth_map_obj"][1:], ret["depth_map_obj"][0:1], mask[0]
-    )
-
-    # TODO add loss to ensure depth map of obj is before static background for
+    # Loss to ensure depth map of obj is before static background for
     # pixels where the mask is positive for dynamic
-    # loss_dict["order_loss"] += L2(
-    #     torch.maximum(ret["depth_map_obj"][1:] - ret["depth_map_obj"][0:1], 0.0), mask[1:]
-    # )
+    loss_dict["order_loss"] = L2(
+        torch.maximum(ret["depth_map_obj"][1:] - ret["depth_map_obj"][0:1], 0.0),
+        mask[1:],
+    )
     return loss_dict
 
 

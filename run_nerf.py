@@ -315,7 +315,6 @@ def train():
         loss = 0
         loss_dict = {}
 
-        # TODO revisit mask loss for points where both static and dynamic are present
         loss_dict = mask_loss(
             loss_dict,
             "",
@@ -342,14 +341,14 @@ def train():
         loss_dict = order_loss(ret, loss_dict, batch_mask)
         loss += args.order_loss_lambda * loss_dict["order_loss"]
 
-        # Depth in NDC space equals to negative disparity in Euclidean space.
-        loss_dict["depth_loss"] = depth_loss(
-            ret["depth_map_obj"], -batch_invdepth, batch_mask
-        )
+        ## Depth in NDC space equals to negative disparity in Euclidean space.
+        # loss_dict["depth_loss"] = depth_loss(
+        #     ret["depth_map_obj"], -batch_invdepth, batch_mask
+        # )
         # loss += args.depth_loss_lambda * loss_dict["depth_loss"]
-        loss_dict["depth_loss_full"] = depth_loss(
-            [ret["depth_map_full"]], [-batch_invdepth_full]
-        )
+        # loss_dict["depth_loss_full"] = depth_loss(
+        #     [ret["depth_map_full"]], [-batch_invdepth_full]
+        # )
         # loss += args.depth_loss_lambda * loss_dict["depth_loss_full"]
 
         # TODO check and fix scene flow losses
@@ -367,7 +366,7 @@ def train():
         loss_dict = sparsity_loss(ret, loss_dict)
         # loss += args.sparse_loss_lambda * loss_dict["sparse_loss"]
 
-        loss_dict = motion_loss(ret, loss_dict, poses, img_i, batch_grid, hwf)
+        # loss_dict = motion_loss(ret, loss_dict, poses, img_i, batch_grid, hwf)
         # if "flow_f_loss" in loss_dict:
         #     loss += args.flow_loss_lambda * Temp * loss_dict["flow_f_loss"]
         # if "flow_b_loss" in loss_dict:
