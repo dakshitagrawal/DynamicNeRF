@@ -166,12 +166,17 @@ def smooth_scene_flow(ret, loss_dict, hwf, mask):
     # Smooth scene flow. The summation of the forward and backward sceneflow should be small.
     H, W, focal = tuple(hwf)
     num_dobj = len(ret["raw_pts"]) - 1
+    assert len(ret["raw_pts_f_f"]) == num_dobj
+    assert len(ret["raw_pts_f"]) == num_dobj
+    assert len(ret["raw_pts_b"]) == num_dobj
+    assert len(ret["raw_pts_b_b"]) == num_dobj
+
     loss_dict["smooth_loss"] = []
     loss_dict["sf_smooth_loss"] = []
     loss_dict["sp_smooth_loss"] = []
     for i in range(num_dobj):
         obj_mask = mask[i] > 0
-        obj_pts = ret["raw_pts"][i, obj_mask]
+        obj_pts = ret["raw_pts"][i + 1, obj_mask]
         obj_pts_f = ret["raw_pts_f"][i, obj_mask]
         obj_pts_b = ret["raw_pts_b"][i, obj_mask]
         obj_pts_b_b = ret["raw_pts_b_b"][i, obj_mask]

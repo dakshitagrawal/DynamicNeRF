@@ -353,18 +353,18 @@ def train():
 
         # TODO check and fix scene flow losses
         loss_dict = slow_scene_flow(ret, loss_dict)
-        # loss += args.slow_loss_lambda * loss_dict["slow_loss"]
+        loss += args.slow_loss_lambda * loss_dict["slow_loss"]
 
-        loss_dict = smooth_scene_flow(ret, loss_dict, hwf, batch_mask)
-        # loss += args.smooth_loss_lambda * loss_dict["smooth_loss"]
-        # loss += args.smooth_loss_lambda * loss_dict["sp_smooth_loss"]
-        # loss += args.smooth_loss_lambda * loss_dict["sf_smooth_loss"]
+        loss_dict = smooth_scene_flow(ret, loss_dict, hwf, batch_mask[1:])
+        loss += args.smooth_loss_lambda * loss_dict["smooth_loss"]
+        loss += args.smooth_loss_lambda * loss_dict["sp_smooth_loss"]
+        loss += args.smooth_loss_lambda * loss_dict["sf_smooth_loss"]
 
         loss_dict = consistency_loss(ret, loss_dict)
-        # loss += args.consistency_loss_lambda * loss_dict["consistency_loss"]
+        loss += args.consistency_loss_lambda * loss_dict["consistency_loss"]
 
         loss_dict = sparsity_loss(ret, loss_dict)
-        # loss += args.sparse_loss_lambda * loss_dict["sparse_loss"]
+        loss += args.sparse_loss_lambda * loss_dict["sparse_loss"]
 
         # loss_dict = motion_loss(ret, loss_dict, poses, img_i, batch_grid, hwf)
         # if "flow_f_loss" in loss_dict:
@@ -375,12 +375,12 @@ def train():
         loss_dict = loss_RGB(
             ret["rgb_map_d_f"], target_rgb, loss_dict, "_d_f", batch_mask[1:], 1
         )
-        # loss += args.dynamic_loss_lambda * loss_dict["img_d_f_loss"]
+        loss += args.dynamic_loss_lambda * loss_dict["img_d_f_loss"]
 
         loss_dict = loss_RGB(
             ret["rgb_map_d_b"], target_rgb, loss_dict, "_d_b", batch_mask[1:], 1
         )
-        # loss += args.dynamic_loss_lambda * loss_dict["img_d_b_loss"]
+        loss += args.dynamic_loss_lambda * loss_dict["img_d_b_loss"]
 
         if chain_5frames:
             loss_dict = loss_RGB(
