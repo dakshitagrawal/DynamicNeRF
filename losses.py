@@ -115,7 +115,10 @@ def order_loss(ret, loss_dict, mask):
     # Loss to ensure depth map of obj is before static background for
     # pixels where the mask is positive for dynamic
     loss_dict["order_loss"] = L2(
-        torch.maximum(ret["depth_map_obj"][1:] - ret["depth_map_obj"][0:1], 0.0),
+        torch.maximum(
+            ret["depth_map_obj"][1:] - ret["depth_map_obj"][0:1],
+            torch.zeros_like(ret["depth_map_obj"][1:]),
+        ),
         mask[1:],
     )
     return loss_dict

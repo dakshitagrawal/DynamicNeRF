@@ -341,6 +341,9 @@ def train():
         loss_dict = order_loss(ret, loss_dict, batch_mask)
         loss += args.order_loss_lambda * loss_dict["order_loss"]
 
+        # loss_dict = sparsity_loss(ret, loss_dict)
+        # loss += args.sparse_loss_lambda * loss_dict["sparse_loss"]
+
         ## Depth in NDC space equals to negative disparity in Euclidean space.
         # loss_dict["depth_loss"] = depth_loss(
         #     ret["depth_map_obj"], -batch_invdepth, batch_mask
@@ -351,7 +354,13 @@ def train():
         # )
         # loss += args.depth_loss_lambda * loss_dict["depth_loss_full"]
 
-        # TODO check and fix scene flow losses
+        ## Ensure predicted optical flow matches GT optical flow
+        # loss_dict = motion_loss(ret, loss_dict, poses, img_i, batch_grid, hwf)
+        # if "flow_f_loss" in loss_dict:
+        #     loss += args.flow_loss_lambda * Temp * loss_dict["flow_f_loss"]
+        # if "flow_b_loss" in loss_dict:
+        #     loss += args.flow_loss_lambda * Temp * loss_dict["flow_b_loss"]
+
         loss_dict = slow_scene_flow(ret, loss_dict)
         loss += args.slow_loss_lambda * loss_dict["slow_loss"]
 
@@ -362,15 +371,6 @@ def train():
 
         loss_dict = consistency_loss(ret, loss_dict)
         loss += args.consistency_loss_lambda * loss_dict["consistency_loss"]
-
-        loss_dict = sparsity_loss(ret, loss_dict)
-        loss += args.sparse_loss_lambda * loss_dict["sparse_loss"]
-
-        # loss_dict = motion_loss(ret, loss_dict, poses, img_i, batch_grid, hwf)
-        # if "flow_f_loss" in loss_dict:
-        #     loss += args.flow_loss_lambda * Temp * loss_dict["flow_f_loss"]
-        # if "flow_b_loss" in loss_dict:
-        #     loss += args.flow_loss_lambda * Temp * loss_dict["flow_b_loss"]
 
         loss_dict = loss_RGB(
             ret["rgb_map_d_f"], target_rgb, loss_dict, "_d_f", batch_mask[1:], 1
